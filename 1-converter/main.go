@@ -3,6 +3,10 @@ package main
 import "fmt"
 
 const (
+	USDToEUR = 0.85
+	USDToRUB = 80.44
+)
+const (
 	usd = "usd"
 	eur = "eur"
 	rub = "rub"
@@ -79,15 +83,37 @@ func inputAmount() (sourceCurrency string, amount int, targetCurrency string) {
 	return
 }
 
-func convertAmount(amount int, sourceCurrency, targetCurrency string) {
-
+func convertAmount(
+	sourceCurrency string,
+	amount int,
+	targetCurrency string) {
+	switch {
+	case sourceCurrency == usd:
+		switch targetCurrency {
+		case eur:
+			fmt.Println("Результат:", float64(amount)*USDToEUR)
+		case rub:
+			fmt.Println("Результат:", float64(amount)*USDToRUB)
+		}
+	case sourceCurrency == eur:
+		switch targetCurrency {
+		case usd:
+			fmt.Println("Результат:", float64(amount)/USDToEUR)
+		case rub:
+			fmt.Println("Результат:", float64(amount)*USDToRUB/USDToEUR)
+		}
+	case sourceCurrency == rub:
+		switch targetCurrency {
+		case usd:
+			fmt.Println("Результат:", float64(amount)/USDToRUB)
+		case eur:
+			fmt.Println("Результат:", float64(amount)/USDToRUB*USDToEUR)
+		}
+	}
 }
 
 func main() {
-	const (
-		USDToEUR = 0.85
-		USDToRUB = 80.44
-	)
 
-	inputAmount()
+	sourceCurrency, amount, targetCurrency := inputAmount()
+	convertAmount(sourceCurrency, amount, targetCurrency)
 }
