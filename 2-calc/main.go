@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -30,24 +31,39 @@ func selectOperation() (operation string) {
 	return
 }
 
-func readLineCSV() (string, error) {
+func readLineCSV() ([]float64, error) {
 	fmt.Print("Введите числа через запятую и нажмите Enter: ")
 	line, err := bufio.NewReader(os.Stdin).ReadString('\n')
-	if err != nil && len(line) == 0 {
-		return "", err
+	if err != nil {
+		return nil, err
 	}
-	return strings.TrimSpace(line), nil
+	return splitNumbersByComma(line), nil
+}
+
+func splitNumbersByComma(s string) []float64 {
+	parts := strings.Split(s, ",")
+	nums := make([]float64, 0, len(parts))
+
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			if num, err := strconv.ParseFloat(p, 64); err == nil {
+				nums = append(nums, num)
+			}
+		}
+	}
+	return nums
 }
 
 func main() {
 	operation := selectOperation()
 	fmt.Println("Вы выбрали:", operation)
 
-	s, err := readLineCSV()
+	numbers, err := readLineCSV()
 	if err != nil {
 		fmt.Println("Ошибка ввода:", err)
 		return
 	}
 
-	fmt.Println("Введено:", s)
+	fmt.Println("Введено:", numbers)
 }
