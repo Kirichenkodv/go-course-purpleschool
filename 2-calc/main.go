@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
@@ -55,6 +56,26 @@ func splitNumbersByComma(s string) []float64 {
 	return nums
 }
 
+func calcSum(numbers []float64) (sum float64) {
+	for _, num := range numbers {
+		sum += num
+	}
+	return
+}
+
+func calcAvg(numbers []float64) float64 {
+	return calcSum(numbers) / float64(len(numbers))
+}
+
+func calcMed(numbers []float64) float64 {
+	sort.Float64s(numbers)
+	n := len(numbers)
+	if n%2 == 1 {
+		return numbers[n/2]
+	}
+	return (numbers[n/2-1] + numbers[n/2]) / 2.0
+}
+
 func main() {
 	operation := selectOperation()
 	fmt.Println("Вы выбрали:", operation)
@@ -66,4 +87,14 @@ func main() {
 	}
 
 	fmt.Println("Введено:", numbers)
+
+	switch operation {
+	case AVG:
+		fmt.Println("Среднее:", calcAvg(numbers))
+	case SUM:
+		fmt.Println("Сумма:", calcSum(numbers))
+	case MED:
+		fmt.Println("Медиана:", calcMed(numbers))
+
+	}
 }
