@@ -12,12 +12,14 @@ const (
     rub = "rub"
 )
 
+type Rates map[string]float64
+
 // RatesToUSD хранит курс каждой валюты к базовой валюте (USD).
 // Пример: 1 EUR = 1.176470588 USD (если 1 USD = 0.85 EUR)
-var RatesToUSD = map[string]float64{
-    usd: 1.0,             // базовая
-    eur: 1 / 0.85,        // 1 USD = 0.85 EUR => 1 EUR = 1/0.85 USD
-    rub: 1 / 80.44,       // 1 USD = 80.44 RUB => 1 RUB = 1/80.44 USD
+var RatesToUSD = &Rates{
+    usd: 1.0,       // базовая
+    eur: 1 / 0.85,  // 1 USD = 0.85 EUR => 1 EUR = 1/0.85 USD
+    rub: 1 / 80.44, // 1 USD = 80.44 RUB => 1 RUB = 1/80.44 USD
 }
 
 // Нормализация строки валюты
@@ -26,22 +28,28 @@ func norm(s string) string {
 }
 
 // Список доступных валют (для подсказок в UI)
-func availableCurrencies() []string {
-    out := make([]string, 0, len(RatesToUSD))
-    for k := range RatesToUSD {
+func availableCurrencies(rates *Rates) []string {
+    m := *rates
+    out := make([]string, 0, len(m))
+    for k := range m {
         out = append(out, k)
     }
     return out
 }
 
+func printCurrencies(rates *Rates) {
+    fmt.Println(strings.Join(availableCurrencies(rates), " "))
+}
+
 // Конвертация через базовую валюту (USD):
 // amount[src] -> USD -> amount[tgt]
-func convert(amount float64, src, tgt string, rates map[string]float64) (float64, error) {
+func convert(amount float64, src, tgt string, rates *Rates) (float64, error) {
     src = norm(src)
     tgt = norm(tgt)
 
-    rateSrcUSD, okSrc := rates[src]
-    rateTgtUSD, okTgt := rates[tgt]
+    m := *rates
+    rateSrcUSD, okSrc := m[src]
+    rateTgtUSD, okTgt := m[tgt]
     if !okSrc || !okTgt {
         return 0, errors.New("неизвестная валюта")
     }
@@ -49,21 +57,22 @@ func convert(amount float64, src, tgt string, rates map[string]float64) (float64
         return 0, errors.New("сумма должна быть больше 0")
     }
     // amount[src] * (USD per src) / (USD per tgt) = amount[tgt]
-    // Эквивалентно: amount * rateSrcUSD / rateTgtUSD
     return amount * rateSrcUSD / rateTgtUSD, nil
 }
 
-func inputAmount() (sourceCurrency string, amount float64, targetCurrency string) {
+func inputAmount(rates *Rates) (sourceCurrency string, amount float64, targetCurrency string) {
+    m := *rates
+
     // 1) Ввод исходной валюты
     for {
         fmt.Println("Введите наименование начальной валюты из следующих возможных:")
-        fmt.Println(strings.Join(availableCurrencies(), " "))
+        printCurrencies(rates)
         if _, err := fmt.Scan(&sourceCurrency); err != nil {
             fmt.Println("Ошибка ввода. Повторите.")
             continue
         }
         sourceCurrency = norm(sourceCurrency)
-        if _, ok := RatesToUSD[sourceCurrency]; ok {
+        if _, ok := m[sourceCurrency]; ok {
             break
         }
         fmt.Println("Неизвестная валюта. Повторите ввод.")
@@ -87,7 +96,7 @@ func inputAmount() (sourceCurrency string, amount float64, targetCurrency string
     // 3) Ввод целевой валюты (исключая исходную)
     for {
         fmt.Println("Введите наименование конечной валюты из следующих возможных:")
-        fmt.Println(strings.Join(availableCurrencies(), " "))
+        printCurrencies(rates)
         if _, err := fmt.Scan(&targetCurrency); err != nil {
             fmt.Println("Ошибка ввода. Повторите.")
             continue
@@ -97,7 +106,7 @@ func inputAmount() (sourceCurrency string, amount float64, targetCurrency string
             fmt.Println("Целевая валюта совпадает с исходной. Повторите.")
             continue
         }
-        if _, ok := RatesToUSD[targetCurrency]; ok {
+        if _, ok := m[targetCurrency]; ok {
             break
         }
         fmt.Println("Недопустимая целевая валюта. Повторите.")
@@ -109,7 +118,7 @@ func inputAmount() (sourceCurrency string, amount float64, targetCurrency string
 }
 
 func main() {
-    src, amt, tgt := inputAmount()
+    src, amt, tgt := inputAmount(RatesToUSD)
 
     res, err := convert(amt, src, tgt, RatesToUSD)
     if err != nil {
