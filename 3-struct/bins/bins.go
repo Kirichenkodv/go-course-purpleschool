@@ -1,0 +1,3 @@
+package bins
+
+func Bins() {}
