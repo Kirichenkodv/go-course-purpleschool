@@ -55,8 +55,8 @@ go run 1-converter/main.go
 
 # Домашнее задание 7
 
-- [ ] Создать новый проект
-- [ ] Создать struct Bin и списка BinList с полями
+- [*] Создать новый проект
+- [*] Создать struct Bin и списка BinList с полями
     - id - строка
     - private - bool
     - createdAt - дата и время
