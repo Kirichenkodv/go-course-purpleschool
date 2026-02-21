@@ -5,16 +5,27 @@ import (
 	"strings"
 )
 
+// Service — реализация чтения файлов (реальная файловая система).
+// Методы Read и IsJSON позволяют использовать *Service как FileReader из main.
+type Service struct{}
+
+// Read читает содержимое файла по пути path и возвращает байты и ошибку.
+func (s *Service) Read(path string) ([]byte, error) {
+	return os.ReadFile(path)
+}
+
 // IsJSON проверяет, что имя файла имеет расширение .json (без учёта регистра).
-// Примеры: "data.json" -> true, "backup.JSON" -> true, "readme.txt" -> false.
-func IsJSON(filename string) bool {
+func (s *Service) IsJSON(filename string) bool {
 	return strings.HasSuffix(strings.ToLower(filename), ".json")
 }
 
-// Read читает содержимое файла по пути path и возвращает байты и ошибку.
-// Путь может быть относительным или абсолютным.
+// Функции-обёртки для обратной совместимости.
 func Read(path string) ([]byte, error) {
-	return os.ReadFile(path)
+	return (&Service{}).Read(path)
+}
+
+func IsJSON(filename string) bool {
+	return (&Service{}).IsJSON(filename)
 }
 
 func File() {}
