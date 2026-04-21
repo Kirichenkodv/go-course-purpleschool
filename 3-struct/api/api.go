@@ -1,8 +1,16 @@
 package api
 
-import "config"
+import (
+	"3-struct/config"
+	"config"
+	"fmt"
+)
 
 func Hello() {
-	key := config.Config.Key
+	cfg := config.New()
+
+	key := cfg.Key
+
+	fmt.Printf("%v", key)
 
 }
