@@ -61,7 +61,7 @@ func run(binsStore BinsStore, fileReader FileReader, binStorage BinStorage) {
 		}
 	}
 
-	api.Hello()
+	// api.Hello()
 
 	// Сохранение списка в файл перед выходом.
 	if err := binStorage.Save(storagePath, binsStore.List()); err != nil {
@@ -72,6 +72,7 @@ func run(binsStore BinsStore, fileReader FileReader, binStorage BinStorage) {
 func main() {
 	// Создаём экземпляр конфигурации
 	cfg := config.New()
+	api.Hello(cfg)
 	// Создаём конкретные реализации (один раз при старте).
 	binsStore := &bins.Service{}
 	fileReader := &file.Service{}

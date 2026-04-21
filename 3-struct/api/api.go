@@ -1,13 +1,11 @@
 package api
 
 import (
-	"3-struct/config"
 	"config"
 	"fmt"
 )
 
-func Hello() {
-	cfg := config.New()
+func Hello(cfg config.Config) {
 
 	key := cfg.Key
 
