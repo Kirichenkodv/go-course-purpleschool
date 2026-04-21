@@ -1,3 +1,8 @@
 package api
 
-func Hello() {}
+import "config"
+
+func Hello() {
+	key := config.Config.Key
+
+}
