@@ -1,7 +1,7 @@
 package api
 
 import (
-	"config"
+	"3-struct/config"
 	"fmt"
 )
 
