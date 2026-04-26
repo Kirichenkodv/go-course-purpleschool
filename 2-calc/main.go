@@ -17,6 +17,13 @@ const (
 )
 
 func main() {
+
+	operationMap := map[string]func([]float64){
+		AVG: calcAvg,
+		SUM: calcSum,
+		MED: calcMed
+	}
+
 	operation := selectOperation()
 	numbers, err := readLineCSV()
 	if err != nil {
@@ -28,7 +35,13 @@ func main() {
 		return
 	}
 	printSummary(operation, numbers)
-	printResult(operation, numbers)
+	// printResult(operation, numbers)
+	// Вызываем соответсвующую функцию расчета
+	if operationFunc, exist := operationMap[operation]; exist {
+		printResult(operation, numbers, operationFunc)
+	} else {
+		printError(errors.New("недопустимая операция"))
+	}
 }
 
 /* ---------- Ввод ---------- */
